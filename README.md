@@ -21,27 +21,12 @@ flowchart LR
 ### Fluxo do `hedged`
 
 ```mermaid
-sequenceDiagram
-    participant C as Chamador
-    participant H as hedged
-    participant A as Chamada original
-    participant B as Cópia
-
-    C->>H: hedged(call, delay)
-    H->>A: dispara
-    alt responde antes do delay
-        A-->>H: resposta
-        H-->>C: resposta (1 chamada)
-    else passou do delay ou falhou
-        H->>B: dispara cópia
-        par corrida
-            A-->>H: ...
-        and
-            B-->>H: ...
-        end
-        H-->>C: primeira resposta com sucesso
-        H->>A: cancela a perdedora
-    end
+flowchart TD
+    A[Dispara a chamada] --> B{Respondeu antes<br/>do delay?}
+    B -- Sim --> R1[Devolve a resposta<br/>1 chamada, custo extra zero]
+    B -- "Não (lenta ou falhou)" --> C[Dispara uma cópia<br/>as duas correm juntas]
+    C --> D[Usa a primeira que<br/>responder com sucesso]
+    D --> E[Cancela a outra]
 ```
 
 Regras:
